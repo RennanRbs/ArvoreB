@@ -11,12 +11,35 @@ class BTree(object):
   class Node(object):
     """Nó simples da arvore B."""
 
-    def __init__(self, t):
-      self.keys = []
-      self.children = []
-      self.leaf = True
-      # t é a ordem que define o tamanho da arvore.
-      self._t = t
+    def search(self, value, node=None):
+    """Retorna verdade se a ArvoreB contem os valores."""
+    if node is None:
+      node = self.root
+    if value in node.keys:
+      return True
+    elif node.leaf:
+      # Condição de chegar na ponta do nó.
+      return False
+    else:
+      i = 0
+      while i < node.size and value > node.keys[i]:
+        i += 1
+      return self.search(value, node.children[i])
+
+  def print_order(self):
+    """Print an level-order representation."""
+    this_level = [self.root]
+    while this_level:
+      next_level = []
+      output = ""
+      for node in this_level:
+        if node.children:
+          next_level.extend(node.children)
+        output += str(node.keys) + " "
+      print(output)
+      this_level = next_level
+ 
+
 
     def split(self, parent, payload):
       """Dividir a arvore e passar os nós  """
@@ -49,6 +72,13 @@ class BTree(object):
     @property
     def size(self):
       return len(self.keys)
+    
+      def __init__(self, t):
+      self.keys = []
+      self.children = []
+      self.leaf = True
+      # t é a ordem que define o tamanho da arvore.
+      self._t = t
 
     def add_key(self, value):
       """Add uma chave para o nó."""
@@ -102,6 +132,18 @@ class BTree(object):
     # Quando divide os nos para baixo e insere formando a folha.
     node.add_key(payload)
 
+    def add_child(self, new_node):
+      """
+      Adicionando ligação ao nó.
+
+      returns: a lista dos nós
+      """
+      i = len(self.children) - 1
+      while i >= 0 and self.children[i].keys[0] > new_node.keys[0]:
+        i -= 1
+      return self.children[:i + 1]+ [new_node] + self.children[i + 1:]
+
+    
   def search(self, value, node=None):
     """Retorna verdade se a ArvoreB contem os valores."""
     if node is None:
